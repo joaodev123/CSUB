@@ -1,0 +1,29 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord", "Discord\Discord.csproj", "{C3F89BDF-6D26-47ED-A084-0252A009BEBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filesystem", "Filesystem\Filesystem.csproj", "{7D90E5BF-8A77-46BB-A971-088A56F1C490}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logic", "Logic\Logic.csproj", "{DBD5204B-DC52-48C4-A9A2-84C8C574F937}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3F89BDF-6D26-47ED-A084-0252A009BEBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3F89BDF-6D26-47ED-A084-0252A009BEBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3F89BDF-6D26-47ED-A084-0252A009BEBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3F89BDF-6D26-47ED-A084-0252A009BEBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D90E5BF-8A77-46BB-A971-088A56F1C490}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D90E5BF-8A77-46BB-A971-088A56F1C490}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D90E5BF-8A77-46BB-A971-088A56F1C490}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D90E5BF-8A77-46BB-A971-088A56F1C490}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBD5204B-DC52-48C4-A9A2-84C8C574F937}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD5204B-DC52-48C4-A9A2-84C8C574F937}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBD5204B-DC52-48C4-A9A2-84C8C574F937}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBD5204B-DC52-48C4-A9A2-84C8C574F937}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
