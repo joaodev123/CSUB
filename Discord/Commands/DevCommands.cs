@@ -36,10 +36,7 @@ namespace Discord.Commands
     }
 
 
-    [OniiSan]
-    [Imouto]
-    [Emoji("💻")]
-    [Group("system")]
+    [OniiSan,Imouto,Emoji("💻"),Group("system")]
     [DSharpPlus.CommandsNext.Attributes.Description("This group configures the systems.")]
     public class System : BaseCommandModule
     {

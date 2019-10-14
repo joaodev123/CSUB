@@ -4,6 +4,7 @@ using System.Linq;
 using Discord.Attributes;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 namespace Discord.Utils
 {
@@ -38,21 +39,25 @@ namespace Discord.Utils
         public static DiscordEmbed HelpEmbed(this CommandsNextExtension cne, CommandContext ctx)
         {
             List<Command> x = cne.RegisteredCommands.Values.ToList();
+            List<Command> delRange = new List<Command>();
             var groups = new List<CommandGroup>();
             foreach (var command in x)
             {
                 if (command is CommandGroup group)
                 {
-                    groups.Add(group);
+                    var show = group.RunChecksAsync(ctx,true).GetAwaiter().GetResult();
+                    if(show.Count() == 0)
+                    {   
+                        groups.Add(group);
+                    }
+                    delRange.Add(command);
                 }
             }
+            delRange.ForEach(gx => x.Remove(gx));
             var helpBuilder = new DiscordEmbedBuilder();
             foreach (var commandGroup in groups)
             {
-                if (commandGroup.CustomAttributes.Any(yx => yx is ImoutoAttribute) && !ctx.Member.PermissionsIn(ctx.Channel).HasPermission(Permissions.ManageRoles))
-                { continue; }
-                if (commandGroup.CustomAttributes.Any(yx => yx is OniiSanAttribute) && ctx.Guild.Id != Bot.Instance().cfg.MasterId)
-                { continue; }
+
                 List<Command> children = commandGroup.Children.ToList();
                 foreach (var command in children)
                 {
@@ -61,20 +66,26 @@ namespace Discord.Utils
 
                 x.Remove(commandGroup);
                 List<Attribute> attributes = commandGroup.CustomAttributes.ToList();
+                commandGroup.ExecutionChecks.ToList().ForEach(yp => attributes.Add(yp));
+                attributes.Reverse();
+                string Prefix = "";
                 foreach (var y in attributes)
                 {
-                    if (!(y is EmojiAttribute emoji)) continue;
-                    helpBuilder.AddField($"{emoji.Emoji} ・ {commandGroup.Name}", commandGroup.Description);
-                    break;
+                    
+                    if(y is ImoutoAttribute) Prefix += "`[妹]` ";
+                    if(y is OniiSanAttribute) Prefix += "`[兄]` ";
+                    if(y is EmojiAttribute emoji) helpBuilder.AddField($"{Prefix}{emoji.Emoji} ・ {commandGroup.Name}", commandGroup.Description);
                 }
+
             }
 
             var misc = "";
             foreach (var command in x)
             {
                 if (command.CustomAttributes.Any(zx => zx is ImoutoAttribute) && !ctx.Member.PermissionsIn(ctx.Channel).HasPermission(Permissions.ManageRoles)) continue;
-                if (command.CustomAttributes.Any(zx => zx is OniiSanAttribute) && ctx.Guild.Id != Bot.Instance().cfg.MasterId) continue;
-                misc += $"`{command.Name}` ";
+                else if (command.CustomAttributes.Any(zx => zx is OniiSanAttribute) && ctx.Guild.Id != Bot.Instance().cfg.MasterId) continue;
+                else if (command.ExecutionChecks.Any(zx => zx is RequireOwnerAttribute) && !ctx.Client.CurrentApplication.Owners.Any(yz => yz.Id == ctx.Member.Id)) continue;
+                else misc += $"`{command.Name}` ";
             }
 
             helpBuilder.AddField("❓ ・ Miscellaneous ", misc);

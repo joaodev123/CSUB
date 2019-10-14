@@ -6,6 +6,7 @@ using Discord.Utils;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using DSharpPlus.Interactivity;
 using static System.Reflection.Assembly;
 namespace Discord
 {
@@ -17,6 +18,7 @@ namespace Discord
         private DiscordConfiguration config;
         public Config cfg;
         public CommandsNextExtension cnext;
+        public InteractivityExtension interactivity;
 
         private Bot(DiscordConfiguration config)
         {
@@ -40,6 +42,9 @@ namespace Discord
                 PrefixResolver = PrefixResolver,
                 EnableDefaultHelp = false,
                 EnableDms = true
+            });
+            this.interactivity = this.client.UseInteractivity(new InteractivityConfiguration{
+                Timeout = TimeSpan.FromMinutes(30)
             });
         }
 
@@ -70,6 +75,9 @@ namespace Discord
                 PrefixResolver = PrefixResolver,
                 EnableDefaultHelp = false,
                 EnableDms = true
+            });
+            this.interactivity = this.client.UseInteractivity(new InteractivityConfiguration{
+                Timeout = TimeSpan.FromMinutes(30)
             });
         }
 
