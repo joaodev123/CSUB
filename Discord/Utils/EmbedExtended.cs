@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Logic.Models;
@@ -30,5 +32,17 @@ namespace Discord.Utils
             }
             return builder.Build();
         }
+        public static async Task<DiscordEmbed> MemberBriefing(List<InfracaoModel> infraList)
+        {
+            DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
+            DiscordUser user = await Bot.Instance().client.GetUserAsync(infraList[0].IdInfrator);
+            string data = "";
+            infraList.ForEach(x => data += $"`[#{x.Id}]` - `{x.MotivoInfracao} (`<@{x.IdStaff}>`)`\n");
+            builder
+            .WithDescription(data)
+            .WithAuthor($"Infrações de {user.Username}#{user.Discriminator}",null,user.AvatarUrl);
+            return builder.Build();
+        }
+
     }
 }

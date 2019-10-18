@@ -32,7 +32,7 @@ namespace Discord.Systems
 
         private async Task MembroEntra(GuildMemberAddEventArgs e)
         {
-            var infra = Infracao.FindAllInfracao(x => x.IdInfrator == e.Member.Id).Where(x => x.Preso);
+            var infra =  new Infracao().FindAll(x => x.IdInfrator == e.Member.Id).Where(x => x.Preso);
             if (infra != null)
             {
                 DiscordRole r = e.Guild.GetRole(Roles.PresoID);

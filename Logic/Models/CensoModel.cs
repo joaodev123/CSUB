@@ -4,6 +4,8 @@ namespace Logic.Models
 {
     public class CensoModel
     {
+        public int Id { get; set; }
+        public ulong DiscordId { get; set; }
         public DateTime Timestamp { get; set; }
         public string Email { get; set; }
         public string Origem { get; set; } //ChegouAUBGE -> Origem

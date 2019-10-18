@@ -7,61 +7,98 @@ using System.Collections.Generic;
 
 namespace Logic
 {
-    public class Infracao
+    public class Infracao : IDatabaseModel<InfracaoModel>
     {
-        public static int GetLastId()
+        public int GetLastId()
         {
             Server s = Server.Instance();
-            Database local = new Database("local",s);
-            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra",local);
-            return infracoes.Documents.Last().Id;
+            Database local = new Database("local", s);
+            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
+            if (infracoes.Documents.Count > 1) return infracoes.Documents.Last().Id;
+            else return 0;
         }
 
-        public static InfracaoModel FindInfracao(Predicate<InfracaoModel> filter)
+        public InfracaoModel Find(Predicate<InfracaoModel> filter)
         {
             Server s = Server.Instance();
-            Database local = new Database("local",s);
-            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra",local);
+            Database local = new Database("local", s);
+            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
             return infracoes.Documents.Find(filter);
         }
-        public static List<InfracaoModel> FindAllInfracao(Predicate<InfracaoModel> filter)
+        public List<InfracaoModel> FindAll(Predicate<InfracaoModel> filter)
         {
             Server s = Server.Instance();
-            Database local = new Database("local",s);
-            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra",local);
+            Database local = new Database("local", s);
+            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
             return infracoes.Documents.FindAll(filter);
         }
-        public static void InsertInfracao(InfracaoModel infracao)
+        public void Insert(InfracaoModel infracao)
         {
             int i = GetLastId();
             i++;
             infracao.Id = i;
             Server s = Server.Instance();
-            Database local = new Database("local",s);
-            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra",local);
+            Database local = new Database("local", s);
+            Collection<MembroModel> membro = new Collection<MembroModel>("membros", local);
+            if (membro.Documents.Any(x => x.DiscordId == infracao.IdInfrator))
+            {
+                MembroModel update = membro.Documents.Find(x => x.DiscordId == infracao.IdInfrator);
+                update.Infracoes.Add(i);
+                new Membro().Update(x => x.DiscordId == infracao.IdInfrator, update);
+            }
+            else
+            {
+                int id = new Membro().GetLastId();
+                id++;
+                List<int> list = new List<int>();
+                list.Add(i);
+                MembroModel m = new MembroModel
+                {
+                    Id = id,
+                    DiscordId = infracao.IdInfrator,
+                    Infracoes = list
+                };
+                new Membro().Insert(m);
+            }
+            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
             infracoes.InsertDocument(infracao);
         }
 
-        public static void DeleteInfracao(Expression<Func<InfracaoModel,bool>> filter)
+        public void Delete(Expression<Func<InfracaoModel, bool>> filter)
         {
             Server s = Server.Instance();
-            Database local = new Database("local",s);
-            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra",local);
+            Database local = new Database("local", s);
+            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
+            Collection<MembroModel> membro = new Collection<MembroModel>("membros", local);
+            var infracao = (InfracaoModel)filter.Compile().Target;
+            if (membro.Documents.Any(x => x.DiscordId == infracao.IdInfrator))
+            {
+                MembroModel update = membro.Documents.Find(x => x.DiscordId == infracao.IdInfrator);
+                update.Infracoes.Remove(infracao.Id);
+                new Membro().Update(x => x.DiscordId == infracao.IdInfrator, update);
+            }
             infracoes.DeleteDocument(filter);
         }
-        public static void DeleteInfracao(InfracaoModel infracao)
+        public void Delete(InfracaoModel infracao)
         {
             Server s = Server.Instance();
-            Database local = new Database("local",s);
-            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra",local);
-            infracoes.DeleteDocument(x => x == infracao);
+            Database local = new Database("local", s);
+            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
+            Collection<MembroModel> membro = new Collection<MembroModel>("membros", local);
+            if (membro.Documents.Any(x => x.DiscordId == infracao.IdInfrator))
+            {
+                MembroModel update = membro.Documents.Find(x => x.DiscordId == infracao.IdInfrator);
+                update.Infracoes.Remove(infracao.Id);
+                new Membro().Update(x => x.DiscordId == infracao.IdInfrator, update);
+            }
+            infracoes.DeleteDocument(x => x.Id == infracao.Id);
         }
-        public static void UpdateInfracao(Expression<Func<InfracaoModel,bool>> filter, InfracaoModel update)
+        public void Update(Expression<Func<InfracaoModel, bool>> filter, InfracaoModel update)
         {
             Server s = Server.Instance();
-            Database local = new Database("local",s);
-            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra",local);
-            infracoes.UpdateDocument(filter,update);
+            Database local = new Database("local", s);
+            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
+            infracoes.UpdateDocument(filter, update);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Filesystem
             {
                 CollectionName = name;
                 Database = database;
-                Documents = db.GetCollection<T>(name).Find(_ => true).ToList();
+                Documents = db.GetCollection<T>(name).Find(FilterDefinition<T>.Empty).ToList();
             }
         }
         public void InsertDocument(T Document)
@@ -38,6 +38,7 @@ namespace Filesystem
             this.Database.Server.Client.GetDatabase(this.Database.DatabaseName).
             GetCollection<T>(this.CollectionName).DeleteOne(filter);
         }
+
         public void UpdateDocument(Expression<Func<T,bool>> filter, T update)
         {
             this.Database.Server.Client.GetDatabase(this.Database.DatabaseName).

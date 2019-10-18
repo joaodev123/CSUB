@@ -3,12 +3,13 @@ namespace Logic.Models
 {
     public class MembroModel
     {
-        public ulong Id { get; set; }
+        public int Id { get; set; }
+        public ulong DiscordId {get;set;}
         public bool Staff { get; set; }
         public List<int> Infracoes { get; set; }
         public Cargo Cargo { get; set; }
 
-        public CensoModel Censo { get; set; }
+        public int Censo { get; set; }
 
     }
     public enum Cargo
