@@ -62,7 +62,7 @@ namespace Discord.Commands.Staff
             infra.Dados.Cargos = ids;
             await info.ModifyAsync(embed: EmbedExtended.AsyncInfracaoEmbed(infra));
             await botMsg.DeleteAsync();
-            Infracao.InsertInfracao(infra);
+            new Infracao().Insert(infra);
             await ctx.RespondAsync(embed: EmbedBase.OutputEmbed("Infração Adicionada com Sucesso."));
         }
         #endregion
@@ -76,16 +76,48 @@ namespace Discord.Commands.Staff
         public async Task List(CommandContext ctx,
         [Description("Membro (Menção/ID)")] DiscordMember membro)
         {
-            var infracoes = Infracao.FindAllInfracao(x => x.IdInfrator == membro.Id);
+            var infracoes =  new Infracao().FindAll(x => x.IdInfrator == membro.Id);
             if (infracoes.Count == 0)
             {
                 await ctx.RespondAsync(embed: EmbedBase.OutputEmbed($"{membro.Mention} possui ficha limpa!"));
             }
             else
             {
-                foreach(InfracaoModel infra in infracoes)
+                foreach (InfracaoModel infra in infracoes)
                 {
                     await ctx.RespondAsync(embed: EmbedExtended.AsyncInfracaoEmbed(infra));
+                }
+            }
+        }
+        #endregion
+        #region Remove
+        [Command("remove"), Description("Remove uma infração")]
+        public async Task RemoveFail(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.CommandHelpEmbed(ctx.Command));
+        [Command("remove")]
+        public async Task Remove(CommandContext ctx, [Description("Membro (ID/Menção)")] DiscordMember membro)
+        {
+            var infras =  new Infracao().FindAll(x => x.IdInfrator == membro.Id);
+            if (infras.Count == 0)
+            {
+                await ctx.RespondAsync(embed: EmbedBase.OutputEmbed($"O Membro {membro.Mention} possui uma ficha limpa!"));
+            }
+            else
+            {
+                var briefing = await ctx.RespondAsync(embed: await EmbedExtended.MemberBriefing(infras));
+                var message = await ctx.RespondAsync(embed: EmbedBase.InputEmbed("# da infração que será apagada"));
+                var input = await ctx.Message.GetNextMessageAsync();
+                var num = int.Parse(input.Result.Content.Split(" ")[0]);
+                if (infras.Any(x => x.Id == num))
+                {
+                    var infra = infras.Find(x => x.Id == num);
+                    new Infracao().Delete(infra);
+                    await briefing.ModifyAsync(embed: EmbedBase.OutputEmbed($"Infração Apagada com sucesso.\n Dados :"));
+                    await message.ModifyAsync(embed: EmbedExtended.AsyncInfracaoEmbed(infra));
+                }
+                else
+                {
+                    await briefing.DeleteAsync();
+                    await message.ModifyAsync(embed: EmbedBase.OutputEmbed($"Numero inválido, Comando cancelado."));
                 }
             }
         }
