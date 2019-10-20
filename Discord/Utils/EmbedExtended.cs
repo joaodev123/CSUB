@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Logic;
 using Logic.Models;
 
 namespace Discord.Utils
@@ -32,6 +34,55 @@ namespace Discord.Utils
             }
             return builder.Build();
         }
+
+        public static async Task<DiscordEmbed> Censo(CensoModel dados)
+        {
+            DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
+            DiscordUser user = await Bot.Instance().client.GetUserAsync(dados.DiscordId);
+            builder
+            .WithColor(DiscordColor.Goldenrod)
+
+            .WithDescription($"Censo Feito em : {TimeZoneInfo.ConvertTimeFromUtc(dados.Timestamp,TimeZoneInfo.FindSystemTimeZoneById("Brazil/East")).ToString(new CultureInfo("pt-BR"))}")
+            .AddField("Idiomas",dados.Idiomas,true)
+            .AddField("Jogos",dados.Jogos,true)
+            .AddField("Origem",dados.Origem,true)
+            .AddField("UF",dados.UF.ToString(),true)
+            .AddField("Email",dados.Email,true)
+            .AddField("Idade",dados.Idade.ToString(),true)
+            .WithAuthor($"Censo do(a) {user.Username}#{user.Discriminator}",null,user.AvatarUrl);
+            return builder.Build();
+        }
+
+        public static async Task<DiscordEmbed> MemberProfile(MembroModel profile)
+        {
+            DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
+            DiscordUser user = await Bot.Instance().client.GetUserAsync(profile.DiscordId);
+            List<InfracaoModel> infracoes = new List<InfracaoModel>();
+            string InfraStr = "";
+            if (profile.Infracoes != null)
+            {
+                profile.Infracoes.ForEach(id => infracoes.Add(new Infracao().Find(x => x.Id == id)));
+            }
+            builder
+            .AddField("Numero de Infrações",infracoes.Count.ToString(),true)
+            .AddField("Cargo",profile.Cargo.ToString(),true)
+            .WithColor(DiscordColor.Blurple)
+            .WithAuthor($"Perfil de {user.Username}#{user.Discriminator}",null,user.AvatarUrl);
+            if(infracoes.Count > 0)
+            {
+                foreach(var infra in infracoes)
+                {
+                    InfraStr += $"`#{infra.Id}` - `{infra.MotivoInfracao} (`<@{infra.IdStaff}>`)`\n";
+                }
+            }
+            else
+            {
+                InfraStr += "`Nenhuma Infração.`";
+            }
+            builder.AddField("Infrações",InfraStr);
+            return builder.Build();
+        }
+
         public static async Task<DiscordEmbed> MemberBriefing(List<InfracaoModel> infraList)
         {
             DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
@@ -40,7 +91,7 @@ namespace Discord.Utils
             infraList.ForEach(x => data += $"`[#{x.Id}]` - `{x.MotivoInfracao} (`<@{x.IdStaff}>`)`\n");
             builder
             .WithDescription(data)
-            .WithAuthor($"Infrações de {user.Username}#{user.Discriminator}",null,user.AvatarUrl);
+            .WithAuthor($"Infrações de {user.Username}#{user.Discriminator}", null, user.AvatarUrl);
             return builder.Build();
         }
 

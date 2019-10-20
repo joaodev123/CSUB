@@ -14,7 +14,7 @@ namespace Logic
             Server s = Server.Instance();
             Database local = new Database("local", s);
             Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
-            if (infracoes.Documents.Count > 1) return infracoes.Documents.Last().Id;
+            if (infracoes.Documents.Count > 0) return infracoes.Documents.Last().Id;
             else return 0;
         }
 
@@ -40,6 +40,8 @@ namespace Logic
             Server s = Server.Instance();
             Database local = new Database("local", s);
             Collection<MembroModel> membro = new Collection<MembroModel>("membros", local);
+            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
+            infracoes.InsertDocument(infracao);
             if (membro.Documents.Any(x => x.DiscordId == infracao.IdInfrator))
             {
                 MembroModel update = membro.Documents.Find(x => x.DiscordId == infracao.IdInfrator);
@@ -60,8 +62,6 @@ namespace Logic
                 };
                 new Membro().Insert(m);
             }
-            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
-            infracoes.InsertDocument(infracao);
         }
 
         public void Delete(Expression<Func<InfracaoModel, bool>> filter)
