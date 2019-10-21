@@ -75,6 +75,7 @@ namespace Logic
             if (item.CategoryId != 0)
             {
                 var category = new ReactCategory().Find(x => x.Id == item.CategoryId);
+                if(category.Roles == null){category.Roles = new List<int>();}
                 category.Roles.Add(item.Id);
                 new ReactCategory().Update(x => x.Id == category.Id, category);
                 role.InsertDocument(item);

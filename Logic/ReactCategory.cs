@@ -22,6 +22,9 @@ namespace Logic
                     new ReactRole().Delete(x => x.Id == i);
                 }
             }
+            var channel = new ReactChannel().Find(x => x.DiscordID == data.ChannelId);
+            channel.Categories.Remove(data.Id);
+            new ReactChannel().Update(x => x.Id == channel.Id,channel);
             category.DeleteDocument(x => x.Id == data.Id);
         }
 
@@ -38,6 +41,9 @@ namespace Logic
                     new ReactRole().Delete(x => x.Id == i);
                 }
             }
+            var channel = new ReactChannel().Find(x => x.DiscordID == data.ChannelId);
+            channel.Categories.Remove(data.Id);
+            new ReactChannel().Update(x => x.Id == channel.Id,channel);
             category.DeleteDocument(x => x.Id == data.Id);
         }
 
@@ -75,9 +81,10 @@ namespace Logic
             id++;
             if(item.ChannelId != 0)
             {
-                var channel = new ReactChannel().Find(x => x.Id == item.ChannelId);
+                var channel = new ReactChannel().Find(x => x.DiscordID == item.ChannelId);
+                if(channel.Categories == null) {channel.Categories = new List<int>();}
                 channel.Categories.Add(id);
-                new ReactChannel().Update(x => x.Id == item.ChannelId , channel);
+                new ReactChannel().Update(x => x.Id == channel.Id , channel);
                 item.Id = id;
                 category.InsertDocument(item);
             }
