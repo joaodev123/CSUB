@@ -1,3 +1,4 @@
+using System.Linq;
 
 using System.Threading.Tasks;
 using DSharpPlus;
@@ -11,7 +12,7 @@ namespace Discord.Attributes
         #pragma warning disable CS1998
         public async override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
         {
-            return ctx.Member.PermissionsIn(ctx.Channel).HasPermission(Permissions.ManageRoles);
+            return ctx.Member.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageRoles));
         }
 
     }

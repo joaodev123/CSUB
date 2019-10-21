@@ -91,7 +91,7 @@ namespace Discord.Commands.Staff
                             string mensagem = "";
                             await message.ModifyAsync(embed: EmbedBase.InputEmbed("Gostaria de adicionar uma mensagem na categoria? [s/n]"));
                             responce = await responce.Result.GetNextMessageAsync();
-                            if (responce.Result.Content[0] == 's')
+                            if (responce.Result.Content.ToLowerInvariant()[0] == 's')
                             {
                                 await message.ModifyAsync(embed: EmbedBase.InputEmbed("Mensagem (Sobre :)"));
                                 responce = await responce.Result.GetNextMessageAsync();
@@ -147,7 +147,7 @@ namespace Discord.Commands.Staff
                                     await message.ModifyAsync(embed: EmbedBase.InputEmbed($"Gostaria de apagar a categoria {category.Name}? [s/n]"));
                                     await list.ModifyAsync(embed: await EmbedExtended.ReactCategory(category));
                                     responce = await ctx.Message.GetNextMessageAsync();
-                                    if (responce.Result.Content[0] == 's')
+                                    if (responce.Result.Content.ToLowerInvariant()[0] == 's')
                                     {
                                         new ReactCategory().Delete(category);
                                         await list.DeleteAsync();

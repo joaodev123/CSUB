@@ -75,7 +75,7 @@ namespace Discord.Commands
                         _Censo.Jogos = responce.Result.Content;
                         await msg.ModifyAsync(embed: EmbedBase.InputEmbed("Você é brasileiro(a) ? Responda com [sim/não]"));
                         responce = await responce.Result.GetNextMessageAsync();
-                        if (responce.Result.Content[0] == 's')
+                        if (responce.Result.Content.ToLowerInvariant()[0] == 's')
                         {
                             await msg.ModifyAsync(embed: EmbedBase.InputEmbed("Sigla do seu estado"));
                             responce = await responce.Result.GetNextMessageAsync();
