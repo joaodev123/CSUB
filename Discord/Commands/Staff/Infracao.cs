@@ -43,7 +43,7 @@ namespace Discord.Commands.Staff
             await info.ModifyAsync(embed: EmbedExtended.AsyncInfracaoEmbed(infra));
             await botMsg.ModifyAsync(embed: EmbedBase.InputEmbed("Será Preso? [s/n]"));
             result = await result.Result.GetNextMessageAsync();
-            infra.Preso = result.Result.Content[0] == 'y' || result.Result.Content[0] == 's';
+            infra.Preso = result.Result.Content.ToLowerInvariant()[0] == 'y' || result.Result.Content.ToLowerInvariant()[0] == 's';
             await info.ModifyAsync(embed: EmbedExtended.AsyncInfracaoEmbed(infra));
             if (infra.Preso)
             {
