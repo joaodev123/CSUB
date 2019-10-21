@@ -45,9 +45,9 @@ namespace Discord.Utils
             {
                 if (command is CommandGroup group)
                 {
-                    var show = group.RunChecksAsync(ctx,true).GetAwaiter().GetResult();
-                    if(show.Count() == 0)
-                    {   
+                    var show = group.RunChecksAsync(ctx, true).GetAwaiter().GetResult();
+                    if (show.Count() == 0)
+                    {
                         groups.Add(group);
                     }
                     delRange.Add(command);
@@ -71,10 +71,10 @@ namespace Discord.Utils
                 string Prefix = "";
                 foreach (var y in attributes)
                 {
-                    
-                    if(y is ImoutoAttribute) Prefix += "`[妹]` ";
-                    if(y is OniiSanAttribute) Prefix += "`[兄]` ";
-                    if(y is EmojiAttribute emoji) helpBuilder.AddField($"{Prefix}{emoji.Emoji} ・ {commandGroup.Name}", commandGroup.Description);
+
+                    if (y is ImoutoAttribute) Prefix += "`[妹]` ";
+                    if (y is OniiSanAttribute) Prefix += "`[兄]` ";
+                    if (y is EmojiAttribute emoji) helpBuilder.AddField($"{Prefix}{emoji.Emoji} ・ {commandGroup.Name}", commandGroup.Description);
                 }
 
             }
@@ -82,10 +82,11 @@ namespace Discord.Utils
             var misc = "";
             foreach (var command in x)
             {
-                if (command.CustomAttributes.Any(zx => zx is ImoutoAttribute) && !ctx.Member.PermissionsIn(ctx.Channel).HasPermission(Permissions.ManageRoles)) continue;
-                else if (command.CustomAttributes.Any(zx => zx is OniiSanAttribute) && ctx.Guild.Id != Bot.Instance().cfg.MasterId) continue;
-                else if (command.ExecutionChecks.Any(zx => zx is RequireOwnerAttribute) && !ctx.Client.CurrentApplication.Owners.Any(yz => yz.Id == ctx.Member.Id)) continue;
-                else misc += $"`{command.Name}` ";
+                var show = command.RunChecksAsync(ctx, true).GetAwaiter().GetResult();
+                if (show.Count() == 0)
+                {
+                    misc += $"`{command.Name}` ";
+                }
             }
 
             helpBuilder.AddField("❓ ・ Miscellaneous ", misc);
