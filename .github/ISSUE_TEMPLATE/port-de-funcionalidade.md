@@ -3,7 +3,7 @@ name: Port de funcionalidade
 about: Use esta template para solicitar que uma função do UBGE-Bot seja portada para
   o CSUB
 title: "[PORT] "
-labels: parity, port, feature
+labels: feature, parity, port
 assignees: ''
 
 ---
@@ -11,6 +11,7 @@ assignees: ''
 Nome :
 Descrição : 
 Tipo :
+`Para marcar a caixa coloque um "x" : - [x] `
 - [ ] Comando
 - [ ] Sistema
 
