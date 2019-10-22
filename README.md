@@ -2,6 +2,7 @@
 
 # CSUB
 Reimplementation of UBGE-Bot by RORIdev.
+Name was originally Closed Source UBGE Bot. Decided to make it OSS since it would (theoretically) speed up development if I ever returned to UBGE (Which I did). 
 
 Bot is using .NET Core 2.2 since we aren't from the stone age anymore.
 
