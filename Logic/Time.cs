@@ -69,7 +69,7 @@ namespace Logic
             Collection<TimeModel> times = new Collection<TimeModel>("times", local);
             Collection<EventoModel> eventos = new Collection<EventoModel>("eventos", local);
             EventoModel evento = eventos.Documents.Find(x => x.Id == item.EventoId);
-            if (evento.Times.Count == 0) evento.Times = new List<int>();
+            if (evento.Times == null) evento.Times = new List<int>();
             evento.Times.Add(item.Id);
             new Evento().Update(x => x.Id == item.EventoId, evento);
             times.InsertDocument(item);
