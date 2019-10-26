@@ -12,7 +12,7 @@ namespace Discord.Commands.Staff
     public class censo : BaseCommandModule
     {
         [GroupCommand()]
-        public async Task groupCommand(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.GroupHelpEmbed(ctx.Command));
+        public async Task groupCommand(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.GroupHelpEmbed(ctx.Command, ctx));
         [Command("censo"), Description("Mostra o censo de um membro.")]
         public async Task censoFailed(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.CommandHelpEmbed(ctx.Command));
         [Command("censo")]

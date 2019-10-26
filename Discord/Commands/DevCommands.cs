@@ -36,14 +36,14 @@ namespace Discord.Commands
     }
 
 
-    [OniiSan,Imouto,Emoji("💻"),Group("system")]
+    [OniiSan, Imouto, Emoji("💻"), Group("system")]
     [DSharpPlus.CommandsNext.Attributes.Description("This group configures the systems.")]
     public class System : BaseCommandModule
     {
         [GroupCommand]
         public async Task Command(CommandContext ctx)
         {
-            var embed = EmbedBase.GroupHelpEmbed(ctx.Command);
+            var embed = EmbedBase.GroupHelpEmbed(ctx.Command, ctx);
             await ctx.RespondAsync(embed: embed);
         }
 
@@ -67,7 +67,7 @@ namespace Discord.Commands
         [GroupCommand]
         public async Task Command(CommandContext ctx)
         {
-            var embed = EmbedBase.GroupHelpEmbed(ctx.Command);
+            var embed = EmbedBase.GroupHelpEmbed(ctx.Command, ctx);
             await ctx.RespondAsync(embed: embed);
         }
 

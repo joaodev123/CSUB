@@ -19,7 +19,7 @@ namespace Discord.Commands
     public class evento : BaseCommandModule
     {
         [GroupCommand()]
-        public async Task groupCommand(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.GroupHelpEmbed(ctx.Command));
+        public async Task groupCommand(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.GroupHelpEmbed(ctx.Command, ctx));
         [Command("criar"), Description("Cria um evento"), Imouto]
         public async Task criarFailed(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.CommandHelpEmbed(ctx.Command));
         [Command("criar")]
@@ -235,6 +235,11 @@ namespace Discord.Commands
             {
                 await ctx.RespondAsync(embed: EmbedBase.OutputEmbed("Não há eventos cadastrados no sistema. Considere criar alguns!"));
             }
+        }
+        [Command("edit"), Description("Edita um evento"), Imouto]
+        public async Task edit(CommandContext ctx)
+        {
+
         }
     }
 }
