@@ -46,6 +46,7 @@ namespace Discord.Utils
             }
             times.ForEach(x => dados += $"{x.Nome}, ");
             builder
+            .AddField("Id", evento.Id == 0 ? "Desconhecido" : evento.Id.ToString())
             .AddField("Numero máximo de times", evento.LimiteTimes == 0 ? "Não há limite" : evento.LimiteTimes.ToString(), true)
             .AddField("Numero máximo de jogadores", evento.LimiteJogadores == 0 ? "Não há limite" : evento.LimiteJogadores.ToString(), true)
             .AddField("Numero máximo de reservas", evento.LimiteReservas == 0 ? "Não há limite" : evento.LimiteReservas.ToString(), true)

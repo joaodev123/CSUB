@@ -13,7 +13,12 @@ namespace Logic
             Server s = Server.Instance();
             Database local = new Database("local", s);
             Collection<EventoModel> eventos = new Collection<EventoModel>("eventos", local);
+            Collection<TimeModel> times = new Collection<TimeModel>("times", local);
             EventoModel model = (EventoModel)filter.Compile().Target;
+            if (model.Times != null)
+            {
+                model.Times.ForEach(x => new Time().Delete(new Time().Find(y => y.Id == x)));
+            }
             eventos.DeleteDocument(x => x.Id == model.Id);
         }
 

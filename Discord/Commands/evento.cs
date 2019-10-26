@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.Attributes;
@@ -175,19 +176,66 @@ namespace Discord.Commands
         public async Task listar(CommandContext ctx)
         {
             List<EventoModel> eventos = new Evento().FindAll(_ => true);
-            List<Page> pages = new List<Page>();
-            eventos.ForEach(async e => pages.Add(new Page($"Lista de eventos ativos", new DiscordEmbedBuilder(await EmbedExtended.AsyncEventoEmbed(e)))));
-            PaginationEmojis emojis = new PaginationEmojis
+            if (eventos.Count > 0)
             {
-                Left = DiscordEmoji.FromName(ctx.Client, ":arrow_left:"),
-                Stop = DiscordEmoji.FromName(ctx.Client, ":stop_button:"),
-                Right = DiscordEmoji.FromName(ctx.Client, ":arrow_right:"),
-                SkipLeft = null,
-                SkipRight = null
-            };
-            await ctx.Channel.SendPaginatedMessageAsync(ctx.User, pages.ToArray(), emojis, PaginationBehaviour.WrapAround, PaginationDeletion.Default, TimeSpan.FromMinutes(30));
+                List<Page> pages = new List<Page>();
+                eventos.ForEach(async e => pages.Add(new Page($"Lista de eventos ativos", new DiscordEmbedBuilder(await EmbedExtended.AsyncEventoEmbed(e)))));
+                PaginationEmojis emojis = new PaginationEmojis
+                {
+                    Left = DiscordEmoji.FromName(ctx.Client, ":arrow_left:"),
+                    Stop = DiscordEmoji.FromName(ctx.Client, ":stop_button:"),
+                    Right = DiscordEmoji.FromName(ctx.Client, ":arrow_right:"),
+                    SkipLeft = null,
+                    SkipRight = null
+                };
+                await ctx.Channel.SendPaginatedMessageAsync(ctx.User, pages.ToArray(), emojis, PaginationBehaviour.WrapAround, PaginationDeletion.Default, TimeSpan.FromMinutes(30));
+            }
+            else
+            {
+                await ctx.RespondAsync(embed: EmbedBase.OutputEmbed("Não existem eventos ativos no momento."));
+            }
         }
-
+        [Command("apagar"), Description("Apaga um evento"), Imouto]
+        public async Task apagar(CommandContext ctx)
+        {
+            List<EventoModel> eventos = new Evento().FindAll(_ => true);
+            if (eventos.Count > 0)
+            {
+                List<Page> pages = new List<Page>();
+                eventos.ForEach(async e => pages.Add(new Page($"", new DiscordEmbedBuilder(await EmbedExtended.AsyncEventoEmbed(e)))));
+                PaginationEmojis emojis = new PaginationEmojis
+                {
+                    Left = DiscordEmoji.FromName(ctx.Client, ":arrow_left:"),
+                    Stop = DiscordEmoji.FromName(ctx.Client, ":stop_button:"),
+                    Right = DiscordEmoji.FromName(ctx.Client, ":arrow_right:"),
+                    SkipLeft = null,
+                    SkipRight = null
+                };
+                var msg = await ctx.RespondAsync(embed: EmbedBase.InputEmbed($"Selecione o evento a ser apagado, Depois clique em {emojis.Stop.ToString()} para confirmar."));
+                await ctx.Channel.SendPaginatedMessageAsync(ctx.User, pages.ToArray(), emojis, PaginationBehaviour.WrapAround, PaginationDeletion.Default, TimeSpan.FromMinutes(30));
+                var lastMsg = (await ctx.Channel.GetMessagesAfterAsync(msg.Id)).ToList().FirstOrDefault(x => x.Author == msg.Author && msg.Embeds.Count > 0);
+                var id = int.Parse(lastMsg.Embeds[0].Fields.ToList().Find(x => x.Name == "Id").Value);
+                var evento = eventos.Find(x => x.Id == id);
+                await lastMsg.DeleteAsync();
+                await msg.ModifyAsync(embed: EmbedBase.InputEmbed($"Selecionado : {evento.Nome}, Deseja apagar? [s/n]"));
+                var input = await ctx.Message.GetNextMessageAsync();
+                switch (input.Result.Content.ToLowerInvariant()[0])
+                {
+                    case 's':
+                    case 'y':
+                        new Evento().Delete(evento);
+                        await msg.ModifyAsync(embed: EmbedBase.OutputEmbed("Evento apagado com sucesso!"));
+                        break;
+                    case 'n':
+                        await msg.ModifyAsync(embed: EmbedBase.OutputEmbed("Comando cancelado."));
+                        break;
+                }
+            }
+            else
+            {
+                await ctx.RespondAsync(embed: EmbedBase.OutputEmbed("Não há eventos cadastrados no sistema. Considere criar alguns!"));
+            }
+        }
     }
 }
 
