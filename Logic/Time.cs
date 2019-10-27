@@ -55,7 +55,7 @@ namespace Logic
             Server s = Server.Instance();
             Database local = new Database("local", s);
             Collection<TimeModel> times = new Collection<TimeModel>("times", local);
-            if (times.Documents.Count > 0) return times.Documents.Count;
+            if (times.Documents != null) return times.Documents.Count;
             else return 0;
         }
 
