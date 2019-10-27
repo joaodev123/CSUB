@@ -14,7 +14,12 @@ namespace Logic
             Database local = new Database("local", s);
             Collection<EventoModel> eventos = new Collection<EventoModel>("eventos", local);
             EventoModel model = (EventoModel)filter.Compile().Target;
+            if (model.Times != null)
+            {
+                model.Times.ForEach(x => new Time().Delete(new Time().Find(y => y.Id == x)));
+            }
             eventos.DeleteDocument(x => x.Id == model.Id);
+
         }
 
         public void Delete(EventoModel item)
@@ -22,6 +27,10 @@ namespace Logic
             Server s = Server.Instance();
             Database local = new Database("local", s);
             Collection<EventoModel> eventos = new Collection<EventoModel>("eventos", local);
+            if (item.Times != null)
+            {
+                item.Times.ForEach(x => new Time().Delete(new Time().Find(y => y.Id == x)));
+            }
             eventos.DeleteDocument(x => x.Id == item.Id);
         }
 

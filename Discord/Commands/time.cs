@@ -147,5 +147,71 @@ namespace Discord.Commands
                 await ctx.RespondAsync(embed: EmbedBase.OutputEmbed("Não há eventos ativos no momento. Inscrição de times foi desativada."));
             }
         }
+        [Command("add"), Description("Adiciona um membro no time")]
+        public async Task addFailed(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.CommandHelpEmbed(ctx.Command));
+        [Command("add")]
+        public async Task add(CommandContext ctx, [Description("O Membro que será adicionado (Menção/ID) ")] DiscordMember membro)
+        {
+            List<EventoModel> eventos = new Evento().FindAll(_ => true);
+            if (eventos.Count > 0)
+            {
+                List<Page> pages = new List<Page>();
+                eventos.ForEach(async e => pages.Add(new Page($"", new DiscordEmbedBuilder(await EmbedExtended.AsyncEventoEmbed(e)))));
+                PaginationEmojis emojis = new PaginationEmojis
+                {
+                    Left = DiscordEmoji.FromName(ctx.Client, ":arrow_left:"),
+                    Stop = DiscordEmoji.FromName(ctx.Client, ":stop_button:"),
+                    Right = DiscordEmoji.FromName(ctx.Client, ":arrow_right:"),
+                    SkipLeft = null,
+                    SkipRight = null
+                };
+                var msg = await ctx.RespondAsync(embed: EmbedBase.InputEmbed($"Selecione o evento que deseja adicionar o membro. Depois clique em {emojis.Stop.ToString()} para confirmar."));
+                await ctx.Channel.SendPaginatedMessageAsync(ctx.User, pages.ToArray(), emojis, PaginationBehaviour.WrapAround, PaginationDeletion.Default, TimeSpan.FromMinutes(30));
+                var lastMsg = (await ctx.Channel.GetMessagesAfterAsync(msg.Id)).ToList().FirstOrDefault(x => x.Author == msg.Author && msg.Embeds.Count > 0);
+                var id = int.Parse(lastMsg.Embeds[0].Fields.ToList().Find(x => x.Name == "Id").Value);
+                var evento = eventos.Find(x => x.Id == id);
+                await lastMsg.DeleteAsync();
+                if (new Time().Find(x => x.EventoId == id && (x.Jogadores.Any(y => y == membro.Id) || (x.Reservas != null && x.Reservas.Any(y => y == membro.Id)))) != null)
+                {
+                    await msg.ModifyAsync(embed: EmbedBase.OutputEmbed("Esse membro já foi adicionado à um time."));
+                }
+                else
+                {
+                    if (new Time().Find(x => x.LiderId == ctx.Member.Id) != null)
+                    {
+                        var time = new Time().Find(x => x.LiderId == ctx.Member.Id && x.EventoId == evento.Id);
+                        if (evento.LimiteJogadores == 0 || time.Jogadores.Count < evento.LimiteJogadores)
+                        {
+                            time.Jogadores.Add(membro.Id);
+                            new Time().Update(x => x.Id == time.Id, time);
+                            await msg.ModifyAsync(embed: EmbedBase.OutputEmbed("Membro adicionado com sucesso!"));
+                        }
+                        else if (evento.LimiteJogadores != 0 && time.Reservas != null && time.Reservas.Count < evento.LimiteReservas || time.Reservas == null && evento.LimiteReservas == 0 || time.Reservas == null)
+                        {
+                            if (!time.Jogadores.Any(x => x == membro.Id))
+                            {
+                                if (time.Reservas == null) time.Reservas = new List<ulong>();
+                                time.Reservas.Add(membro.Id);
+                                new Time().Update(x => x.Id == time.Id, time);
+                                await msg.ModifyAsync(embed: EmbedBase.OutputEmbed("Reserva adicionado com sucesso!"));
+                            }
+                        }
+                        else
+                        {
+                            await msg.ModifyAsync(embed: EmbedBase.OutputEmbed("Limite de membros atingido."));
+                        }
+                    }
+                    else
+                    {
+                        await msg.ModifyAsync(embed: EmbedBase.OutputEmbed("Você não é lider de nenhum time."));
+                    }
+                }
+
+            }
+            else
+            {
+                await ctx.RespondAsync(embed: EmbedBase.OutputEmbed("Não há eventos ativos no momento. Inscrição de times foi desativada."));
+            }
+        }
     }
 }
