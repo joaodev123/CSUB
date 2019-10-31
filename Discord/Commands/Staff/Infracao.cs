@@ -19,7 +19,7 @@ namespace Discord.Commands.Staff
         [GroupCommand()]
         public async Task GroupCommand(CommandContext ctx)
         {
-            await ctx.RespondAsync(embed: EmbedBase.GroupHelpEmbed(ctx.Command));
+            await ctx.RespondAsync(embed: EmbedBase.GroupHelpEmbed(ctx.Command, ctx));
         }
         #region Add
         [Command("add"), Description("Adiciona uma infracao")]
@@ -76,7 +76,7 @@ namespace Discord.Commands.Staff
         public async Task List(CommandContext ctx,
         [Description("Membro (Menção/ID)")] DiscordMember membro)
         {
-            var infracoes =  new Infracao().FindAll(x => x.IdInfrator == membro.Id);
+            var infracoes = new Infracao().FindAll(x => x.IdInfrator == membro.Id);
             if (infracoes.Count == 0)
             {
                 await ctx.RespondAsync(embed: EmbedBase.OutputEmbed($"{membro.Mention} possui ficha limpa!"));
@@ -96,7 +96,7 @@ namespace Discord.Commands.Staff
         [Command("remove")]
         public async Task Remove(CommandContext ctx, [Description("Membro (ID/Menção)")] DiscordMember membro)
         {
-            var infras =  new Infracao().FindAll(x => x.IdInfrator == membro.Id);
+            var infras = new Infracao().FindAll(x => x.IdInfrator == membro.Id);
             if (infras.Count == 0)
             {
                 await ctx.RespondAsync(embed: EmbedBase.OutputEmbed($"O Membro {membro.Mention} possui uma ficha limpa!"));

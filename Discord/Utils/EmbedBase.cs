@@ -12,7 +12,7 @@ namespace Discord.Utils
     public static class EmbedBase
     {
 
-        public static DiscordEmbed GroupHelpEmbed(Command Command)
+        public static DiscordEmbed GroupHelpEmbed(Command Command, CommandContext ctx)
         {
             List<Command> commands = new List<Command>();
             CommandGroup cG = null;
@@ -24,7 +24,11 @@ namespace Discord.Utils
             var commandList = "";
             foreach (var command in commands)
             {
-                commandList += $"{command.Name} - {command.Description}\n";
+                var show = command.RunChecksAsync(ctx, true).GetAwaiter().GetResult();
+                if (show.Count() == 0)
+                {
+                    commandList += $"{command.Name} - {command.Description}\n";
+                }
             }
             var groupHelpEmbed = new DiscordEmbedBuilder();
             groupHelpEmbed

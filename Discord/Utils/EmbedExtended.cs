@@ -34,6 +34,27 @@ namespace Discord.Utils
             }
             return builder.Build();
         }
+#pragma warning disable CS1998
+        public static async Task<DiscordEmbed> AsyncEventoEmbed(EventoModel evento)
+        {
+            DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
+            string dados = "";
+            List<TimeModel> times = new List<TimeModel>();
+            if (evento.Times != null)
+            {
+                evento.Times.ForEach(x => times.Add(new Time().Find(y => y.Id == x)));
+            }
+            times.ForEach(x => dados += $"{x.Nome}, ");
+            builder
+            .AddField("Id", evento.Id == 0 ? "Desconhecido" : evento.Id.ToString())
+            .AddField("Numero máximo de times", evento.LimiteTimes == 0 ? "Não há limite" : evento.LimiteTimes.ToString(), true)
+            .AddField("Numero máximo de jogadores", evento.LimiteJogadores == 0 ? "Não há limite" : evento.LimiteJogadores.ToString(), true)
+            .AddField("Numero máximo de reservas", evento.LimiteReservas == 0 ? "Não há limite" : evento.LimiteReservas.ToString(), true)
+            .AddField("Times", $"{(String.IsNullOrEmpty(dados) ? "Nenhum Time foi registrado" : dados)}", true)
+            .WithAuthor($"Eventos : {evento.Nome}")
+            .WithColor(DiscordColor.Lilac);
+            return builder.Build();
+        }
 
         public static async Task<DiscordEmbed> Censo(CensoModel dados)
         {

@@ -19,7 +19,7 @@ namespace Discord.Commands.Staff
     public class react : BaseCommandModule
     {
         [GroupCommand()]
-        public async Task GroupCommand(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.GroupHelpEmbed(ctx.Command));
+        public async Task GroupCommand(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.GroupHelpEmbed(ctx.Command, ctx));
         [Command("channel"), Description("Cria/Remove Canais do Sistema de ReactRole")]
         public async Task channelFailed(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.CommandHelpEmbed(ctx.Command));
         [Command("channel")]
