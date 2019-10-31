@@ -75,7 +75,7 @@ namespace Discord.Commands
                 await ctx.RespondAsync(embed: EmbedBase.OutputEmbed("Não há eventos ativos no momento. Inscrição de times foi desativada."));
             }
         }
-        [Command("sair"), Description("Sai de um time. **Atenção Líderes : **Ao executar esse comando você ***apaga*** o time. Se for sair transfira a liderança primeiro.")]
+        [Command("sair"), Description("Sai de um time.\n\t**Atenção Líderes : **Ao executar esse comando você ***apaga*** o time. Se for sair transfira a liderança primeiro.")]
         public async Task sair(CommandContext ctx)
         {
             List<EventoModel> eventos = new Evento().FindAll(_ => true);
@@ -273,7 +273,48 @@ namespace Discord.Commands
                 await ctx.RespondAsync(embed: EmbedBase.OutputEmbed("Não há eventos ativos no momento. Inscrição de times foi desativada."));
             }
         }
-
+        [Command("edit"), Description("Edita o nome do time")]
+        public async Task editFailed(CommandContext ctx) => await ctx.RespondAsync(embed: EmbedBase.CommandHelpEmbed(ctx.Command));
+        [Command("edit")]
+        public async Task edit(CommandContext ctx, [Description("O novo nome"), RemainingText] string nome)
+        {
+            List<EventoModel> eventos = new Evento().FindAll(_ => true);
+            if (eventos.Count > 0)
+            {
+                List<Page> pages = new List<Page>();
+                eventos.ForEach(async x => pages.Add(new Page("", new DiscordEmbedBuilder(await EmbedExtended.AsyncEventoEmbed(x)))));
+                PaginationEmojis emojis = new PaginationEmojis
+                {
+                    Left = DiscordEmoji.FromName(ctx.Client, ":arrow_left:"),
+                    Stop = DiscordEmoji.FromName(ctx.Client, ":stop_button:"),
+                    Right = DiscordEmoji.FromName(ctx.Client, ":arrow_right:"),
+                    SkipLeft = null,
+                    SkipRight = null
+                };
+                var msg = await ctx.RespondAsync(embed: EmbedBase.InputEmbed($"Selecione o evento que deseja adicionar o membro. Depois clique em {emojis.Stop.ToString()} para confirmar."));
+                await ctx.Channel.SendPaginatedMessageAsync(ctx.User, pages.ToArray(), emojis, PaginationBehaviour.WrapAround, PaginationDeletion.Default, TimeSpan.FromMinutes(30));
+                var lastMsg = (await ctx.Channel.GetMessagesAfterAsync(msg.Id)).ToList().FirstOrDefault(x => x.Author == msg.Author && msg.Embeds.Count > 0);
+                var id = int.Parse(lastMsg.Embeds[0].Fields.ToList().Find(x => x.Name == "Id").Value);
+                var evento = eventos.Find(x => x.Id == id);
+                await lastMsg.DeleteAsync();
+                List<TimeModel> times = new Time().FindAll(x => x.EventoId == id && x.LiderId == ctx.Member.Id);
+                if (times.Count > 0)
+                {
+                    var time = times[0];
+                    time.Nome = nome;
+                    new Time().Update(x => x.Id == time.Id, time);
+                    await msg.ModifyAsync(embed: EmbedBase.OutputEmbed($"Nome alterado para {time.Nome} com sucesso!"));
+                }
+                else
+                {
+                    await msg.ModifyAsync(embed: EmbedBase.OutputEmbed("Você não é lider de nenhum time neste evento."));
+                }
+            }
+            else
+            {
+                await ctx.RespondAsync(embed: EmbedBase.OutputEmbed("Não há eventos ativos no momento. Inscrição de times foi desativada."));
+            }
+        }
     }
 }
 
