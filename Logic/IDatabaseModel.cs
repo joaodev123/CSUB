@@ -10,7 +10,8 @@ namespace Logic
         T Find(Predicate<T> filter);
         List<T> FindAll(Predicate<T> filter);
         void Insert(T item);
-        void Delete(Expression<Func<T, bool>> filter);
+        // Deprecated
+        // void Delete(Expression<Func<T, bool>> filter);
         void Delete(T item);
         void Update(Expression<Func<T, bool>> filter, T update);
     }

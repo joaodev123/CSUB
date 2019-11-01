@@ -9,18 +9,6 @@ namespace Logic
 {
     public class Censo : IDatabaseModel<CensoModel>
     {
-        public void Delete(Expression<Func<CensoModel, bool>> filter)
-        {
-            Server s = Server.Instance();
-            Database local = new Database("local", s);
-            Collection<CensoModel> censo = new Collection<CensoModel>("censo", local);
-            var c = (CensoModel)filter.Compile().Target;
-            var membro = new Membro().Find(x => x.DiscordId == c.DiscordId);
-            membro.Censo = 0;
-            new Membro().Update(x => x.Id == membro.Id, membro);
-            censo.DeleteDocument(filter);
-        }
-
         public void Delete(CensoModel item)
         {
             Server s = Server.Instance();

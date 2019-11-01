@@ -64,21 +64,6 @@ namespace Logic
             }
         }
 
-        public void Delete(Expression<Func<InfracaoModel, bool>> filter)
-        {
-            Server s = Server.Instance();
-            Database local = new Database("local", s);
-            Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
-            Collection<MembroModel> membro = new Collection<MembroModel>("membros", local);
-            var infracao = (InfracaoModel)filter.Compile().Target;
-            if (membro.Documents.Any(x => x.DiscordId == infracao.IdInfrator))
-            {
-                MembroModel update = membro.Documents.Find(x => x.DiscordId == infracao.IdInfrator);
-                update.Infracoes.Remove(infracao.Id);
-                new Membro().Update(x => x.DiscordId == infracao.IdInfrator, update);
-            }
-            infracoes.DeleteDocument(filter);
-        }
         public void Delete(InfracaoModel infracao)
         {
             Server s = Server.Instance();

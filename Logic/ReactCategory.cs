@@ -9,25 +9,6 @@ namespace Logic
 {
     public class ReactCategory : IDatabaseModel<ReactCategoryModel>
     {
-        public void Delete(Expression<Func<ReactCategoryModel, bool>> filter)
-        {
-            Server s = Server.Instance();
-            Database react = new Database("react", s);
-            Collection<ReactCategoryModel> category = new Collection<ReactCategoryModel>("category", react);
-            var data = (ReactCategoryModel)filter.Compile().Target;
-            if (data.Roles != null)
-            {
-                foreach (int i in data.Roles)
-                {
-                    new ReactRole().Delete(x => x.Id == i);
-                }
-            }
-            var channel = new ReactChannel().Find(x => x.DiscordID == data.ChannelId);
-            channel.Categories.Remove(data.Id);
-            new ReactChannel().Update(x => x.Id == channel.Id,channel);
-            category.DeleteDocument(x => x.Id == data.Id);
-        }
-
         public void Delete(ReactCategoryModel item)
         {
             Server s = Server.Instance();
@@ -38,12 +19,12 @@ namespace Logic
             {
                 foreach (int i in data.Roles)
                 {
-                    new ReactRole().Delete(x => x.Id == i);
+                    new ReactRole().Delete(new ReactRole().Find(x => x.Id == i));
                 }
             }
             var channel = new ReactChannel().Find(x => x.DiscordID == data.ChannelId);
             channel.Categories.Remove(data.Id);
-            new ReactChannel().Update(x => x.Id == channel.Id,channel);
+            new ReactChannel().Update(x => x.Id == channel.Id, channel);
             category.DeleteDocument(x => x.Id == data.Id);
         }
 
@@ -68,7 +49,7 @@ namespace Logic
             Server s = Server.Instance();
             Database react = new Database("react", s);
             Collection<ReactCategoryModel> category = new Collection<ReactCategoryModel>("category", react);
-            if(category.Documents.Count > 0) return category.Documents.Last().Id;
+            if (category.Documents.Count > 0) return category.Documents.Last().Id;
             else return 0;
         }
 
@@ -79,12 +60,12 @@ namespace Logic
             Collection<ReactCategoryModel> category = new Collection<ReactCategoryModel>("category", react);
             int id = GetLastId();
             id++;
-            if(item.ChannelId != 0)
+            if (item.ChannelId != 0)
             {
                 var channel = new ReactChannel().Find(x => x.DiscordID == item.ChannelId);
-                if(channel.Categories == null) {channel.Categories = new List<int>();}
+                if (channel.Categories == null) { channel.Categories = new List<int>(); }
                 channel.Categories.Add(id);
-                new ReactChannel().Update(x => x.Id == channel.Id , channel);
+                new ReactChannel().Update(x => x.Id == channel.Id, channel);
                 item.Id = id;
                 category.InsertDocument(item);
             }
@@ -95,7 +76,7 @@ namespace Logic
             Server s = Server.Instance();
             Database react = new Database("react", s);
             Collection<ReactCategoryModel> category = new Collection<ReactCategoryModel>("category", react);
-            category.UpdateDocument(filter,update);
+            category.UpdateDocument(filter, update);
         }
     }
 }
