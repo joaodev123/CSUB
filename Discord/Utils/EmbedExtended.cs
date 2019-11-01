@@ -24,8 +24,9 @@ namespace Discord.Utils
             .WithAuthor("Detalhes da Infração")
             .WithDescription(infraInfo)
             .WithColor(DiscordColor.Brown);
-            if (infra.Dados != null)
+            if (infra.Preso)
             {
+
                 string infraCargos = "";
                 infra.Dados.Cargos.ForEach(x => infraCargos += $"<&@{x.Value}>, ");
                 string infraDados = $"Cargos : {(infra.Dados.Cargos == null ? "Sem Dados" : $"{infraCargos}")}\n" +
