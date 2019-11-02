@@ -57,7 +57,7 @@ namespace Logic
             Database local = new Database("local", s);
             Collection<PrisaoModel> prisao = new Collection<PrisaoModel>("prisao", local);
             Collection<InfracaoModel> infracoes = new Collection<InfracaoModel>("infra", local);
-            InfracaoModel infra = new Infracao().Find(x => x.PrisaoId == item.Id);
+            InfracaoModel infra = new Infracao().Find(x => x.Id == item.InfraId);
             infra.PrisaoId = item.Id;
             infra.Preso = true;
             infracoes.UpdateDocument(x => x.Id == infra.Id, infra);

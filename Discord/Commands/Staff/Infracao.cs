@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -45,25 +46,53 @@ namespace Discord.Commands.Staff
             result = await result.Result.GetNextMessageAsync();
             infra.Preso = result.Result.Content.ToLowerInvariant()[0] == 'y' || result.Result.Content.ToLowerInvariant()[0] == 's';
             await info.ModifyAsync(embed: EmbedExtended.AsyncInfracaoEmbed(infra));
+            PrisaoModel prisao = new PrisaoModel();
             if (infra.Preso)
             {
                 await botMsg.ModifyAsync(embed: EmbedBase.InputEmbed("Tempo [xM, xH]"));
                 result = await result.Result.GetNextMessageAsync();
-                infra.Dados = new DadosPrisao();
-                infra.Dados.Tempo = result.Result.Content;
+                prisao = new PrisaoModel
+                {
+                    Data = DateTime.Now.ToUniversalTime(),
+                    Cargos = membro.Roles.Select(x => x.Id).ToList(),
+                };
+
+                if (result.Result.Content.ToLowerInvariant().Contains("h"))
+                {
+
+                    Regex getUlong = new Regex(@"([0-9])+");
+                    int i = 0;
+                    if (getUlong.IsMatch(result.Result.Content)) i = int.Parse(getUlong.Match(result.Result.Content).ToString());
+                    TimeSpan s = TimeSpan.FromHours(i);
+                    prisao.Duracao = s;
+                    prisao.GuildId = ctx.Guild.Id;
+                    await Prender(membro, ctx.Guild);
+                    prisao.Elapsed = false;
+                }
+                else if (result.Result.Content.ToLowerInvariant().Contains("m"))
+                {
+                    Regex getUlong = new Regex(@"([0-9])+");
+                    int i = 0;
+                    if (getUlong.IsMatch(result.Result.Content)) i = int.Parse(getUlong.Match(result.Result.Content).ToString());
+                    TimeSpan s = TimeSpan.FromMinutes(i);
+                    prisao.Duracao = s;
+                    prisao.GuildId = ctx.Guild.Id;
+                    await Prender(membro, ctx.Guild);
+                    prisao.Elapsed = false;
+                }
             }
-            else
-            {
-                infra.Dados = new DadosPrisao();
-                infra.Dados.Tempo = "0s";
-            }
-            List<ulong?> ids = new List<ulong?>();
-            membro.Roles.ToList().ForEach(x => ids.Add(x.Id));
-            infra.Dados.Cargos = ids;
             await info.ModifyAsync(embed: EmbedExtended.AsyncInfracaoEmbed(infra));
             await botMsg.DeleteAsync();
             new Infracao().Insert(infra);
+            prisao.InfraId = new Infracao().FindAll(x => x.IdInfrator == membro.Id).Last().Id;
+            new Prisao().Insert(prisao);
             await ctx.RespondAsync(embed: EmbedBase.OutputEmbed("Infração Adicionada com Sucesso."));
+        }
+
+        private async Task Prender(DiscordMember membro, DiscordGuild guild)
+        {
+            membro.Roles.ToList().ForEach(async r => await membro.RevokeRoleAsync(r));
+            await membro.GrantRoleAsync(guild.GetRole(Roles.PresoID));
         }
         #endregion
         #region List
