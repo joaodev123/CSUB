@@ -24,13 +24,19 @@ namespace Discord.Utils
             .WithAuthor("Detalhes da Infração")
             .WithDescription(infraInfo)
             .WithColor(DiscordColor.Brown);
-            if (infra.Dados != null)
+            if (infra.Preso)
             {
-                string infraCargos = "";
-                infra.Dados.Cargos.ForEach(x => infraCargos += $"<&@{x.Value}>, ");
-                string infraDados = $"Cargos : {(infra.Dados.Cargos == null ? "Sem Dados" : $"{infraCargos}")}\n" +
-                $"Tempo : {(String.IsNullOrWhiteSpace(infra.Dados.Tempo) ? "Sem Dados" : $"{infra.Dados.Tempo}")}";
-                builder.AddField("Dados", infraDados);
+
+                PrisaoModel prisao = new Prisao().Find(x => x.InfraId == infra.Id);
+                if (prisao != null)
+                {
+                    string infraCargos = "";
+                    if (prisao.Cargos != null) prisao.Cargos.ForEach(x => infraCargos += $"<@&{x}>, ");
+                    string infraDados = $"Cargos : {(String.IsNullOrWhiteSpace(infraCargos) ? "Sem Dados" : $"{infraCargos}")}\n" +
+                    $"Tempo : {(prisao.Duracao.Equals(new TimeSpan()) ? "Sem Dados" : $"{prisao.Duracao.ToString(@"dd\.hh\:mm")}hrs")}";
+                    builder.AddField("Dados", infraDados);
+                }
+
             }
             return builder.Build();
         }

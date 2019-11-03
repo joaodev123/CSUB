@@ -9,22 +9,6 @@ namespace Logic
 {
     public class ReactChannel : IDatabaseModel<ReactChannelModel>
     {
-        public void Delete(Expression<Func<ReactChannelModel, bool>> filter)
-        {
-            Server s = Server.Instance();
-            Database react = new Database("react", s);
-            Collection<ReactChannelModel> channel = new Collection<ReactChannelModel>("channel", react);
-            var data = (ReactChannelModel)filter.Compile().Target;
-            if (data.Categories != null)
-            {
-                foreach (int i in data.Categories)
-                {
-                    new ReactCategory().Delete(x => x.Id == i);
-                }
-            }
-            channel.DeleteDocument(x => x.Id == data.Id);
-
-        }
 
         public void Delete(ReactChannelModel item)
         {
@@ -36,7 +20,7 @@ namespace Logic
             {
                 foreach (int i in data.Categories)
                 {
-                    new ReactCategory().Delete(x => x.Id == i);
+                    new ReactCategory().Delete(new ReactCategory().Find(x => x.Id == i));
                 }
             }
             channel.DeleteDocument(x => x.Id == data.Id);
@@ -86,7 +70,7 @@ namespace Logic
             Server s = Server.Instance();
             Database react = new Database("react", s);
             Collection<ReactChannelModel> channel = new Collection<ReactChannelModel>("channel", react);
-            channel.UpdateDocument(filter,update);
+            channel.UpdateDocument(filter, update);
         }
     }
 }

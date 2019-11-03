@@ -9,17 +9,6 @@ namespace Logic
 {
     public class Membro : IDatabaseModel<MembroModel>
     {
-        public void Delete(Expression<Func<MembroModel, bool>> filter)
-        {
-            Server s = Server.Instance();
-            Database local = new Database("local", s);
-            Collection<MembroModel> membros = new Collection<MembroModel>("membros", local);
-            var membro = (MembroModel)filter.Compile().Target;
-            var infras = new Infracao().FindAll(x => x.IdInfrator == membro.DiscordId);
-            infras.ForEach(x => new Infracao().Delete(x));
-            membros.DeleteDocument(filter);
-        }
-
         public void Delete(MembroModel item)
         {
             Server s = Server.Instance();
@@ -51,7 +40,7 @@ namespace Logic
             Server s = Server.Instance();
             Database local = new Database("local", s);
             Collection<MembroModel> membros = new Collection<MembroModel>("membros", local);
-            if(membros.Documents.Count > 0) return membros.Documents.Last().Id;
+            if (membros.Documents.Count > 0) return membros.Documents.Last().Id;
             else return 0;
         }
 
@@ -72,9 +61,9 @@ namespace Logic
         public void Update(Expression<Func<MembroModel, bool>> filter, MembroModel update)
         {
             Server s = Server.Instance();
-            Database local = new Database("local",s);
+            Database local = new Database("local", s);
             Collection<MembroModel> membros = new Collection<MembroModel>("membros", local);
-            membros.UpdateDocument(filter,update);
+            membros.UpdateDocument(filter, update);
         }
     }
 }

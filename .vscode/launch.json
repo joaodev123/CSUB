@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Discord/bin/Debug/netcoreapp2.2/Discord.dll",
+            "program": "${workspaceFolder}/Discord/bin/Debug/netcoreapp3.0/Discord",
             "args": [],
             "cwd": "${workspaceFolder}/Discord",
             "console": "internalConsole",

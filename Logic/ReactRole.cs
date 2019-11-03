@@ -9,20 +9,6 @@ namespace Logic
 {
     public class ReactRole : IDatabaseModel<ReactRoleModel>
     {
-        public void Delete(Expression<Func<ReactRoleModel, bool>> filter)
-        {
-            Server s = Server.Instance();
-            Database react = new Database("react", s);
-            Collection<ReactRoleModel> role = new Collection<ReactRoleModel>("role", react);
-            var data = (ReactRoleModel)filter.Compile().Target;
-            if (data.CategoryId != 0)
-            {
-                var category = new ReactCategory().Find(x => x.Id == data.CategoryId);
-                category.Roles.Remove(data.Id);
-                new ReactCategory().Update(x => x.Id == category.Id, category);
-                role.DeleteDocument(x => x.Id == data.Id);
-            }
-        }
 
         public void Delete(ReactRoleModel item)
         {
@@ -75,7 +61,7 @@ namespace Logic
             if (item.CategoryId != 0)
             {
                 var category = new ReactCategory().Find(x => x.Id == item.CategoryId);
-                if(category.Roles == null){category.Roles = new List<int>();}
+                if (category.Roles == null) { category.Roles = new List<int>(); }
                 category.Roles.Add(item.Id);
                 new ReactCategory().Update(x => x.Id == category.Id, category);
                 role.InsertDocument(item);
@@ -87,7 +73,7 @@ namespace Logic
             Server s = Server.Instance();
             Database react = new Database("react", s);
             Collection<ReactRoleModel> role = new Collection<ReactRoleModel>("role", react);
-            role.UpdateDocument(filter,update);
+            role.UpdateDocument(filter, update);
         }
     }
 }
