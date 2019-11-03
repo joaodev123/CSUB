@@ -33,7 +33,7 @@ namespace Discord.Utils
                     string infraCargos = "";
                     if (prisao.Cargos != null) prisao.Cargos.ForEach(x => infraCargos += $"<@&{x}>, ");
                     string infraDados = $"Cargos : {(String.IsNullOrWhiteSpace(infraCargos) ? "Sem Dados" : $"{infraCargos}")}\n" +
-                    $"Tempo : {(prisao.Duracao.Equals(new TimeSpan()) ? "Sem Dados" : $"{prisao.Duracao.ToString()}")}";
+                    $"Tempo : {(prisao.Duracao.Equals(new TimeSpan()) ? "Sem Dados" : $"{prisao.Duracao.ToString(@"dd\.hh\:mm")}hrs")}";
                     builder.AddField("Dados", infraDados);
                 }
 

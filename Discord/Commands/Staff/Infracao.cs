@@ -91,7 +91,10 @@ namespace Discord.Commands.Staff
 
         private async Task Prender(DiscordMember membro, DiscordGuild guild)
         {
-            membro.Roles.ToList().ForEach(async r => await membro.RevokeRoleAsync(r));
+            foreach (var r in membro.Roles.ToList())
+            {
+                await membro.RevokeRoleAsync(r);
+            };
             await membro.GrantRoleAsync(guild.GetRole(Roles.PresoID));
         }
         #endregion

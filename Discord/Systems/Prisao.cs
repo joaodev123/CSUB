@@ -42,7 +42,7 @@ namespace Discord.Systems
             Console.WriteLine("[Check @ Systems/Prisao.cs] Completed.");
         }
 
-        private async Task Soltar(PrisaoModel p)
+        public static async Task Soltar(PrisaoModel p)
         {
             var guild = await Bot.Instance().client.GetGuildAsync(p.GuildId);
             var member = await guild.GetMemberAsync(new Infracao().Find(x => x.Id == p.InfraId).IdInfrator);
